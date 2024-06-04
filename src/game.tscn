@@ -1,0 +1,95 @@
+[gd_scene load_steps=6 format=3 uid="uid://b7dyhtxf7qwo5"]
+
+[ext_resource type="Script" path="res://src/game_controller.gd" id="1_2e41u"]
+[ext_resource type="PackedScene" uid="uid://cubnfmv0qbi1x" path="res://src/note_world.tscn" id="1_alvsf"]
+[ext_resource type="Texture2D" uid="uid://bclkomopr4vc5" path="res://test/Muse - Starlight [3-UP]/album.png" id="2_wjfqg"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hauoq"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_jcpgq"]
+line_spacing = -6.0
+font_size = 20
+outline_size = 2
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 2
+shadow_color = Color(0.192157, 0.192157, 0.192157, 0.72549)
+
+[node name="World" type="CanvasLayer"]
+script = ExtResource("1_2e41u")
+song_ini_path = "res://test/Muse - Starlight [3-UP]/song.ini"
+song_chart_path = "res://test/Muse - Starlight [3-UP]/notes.chart"
+cover_image = ExtResource("2_wjfqg")
+
+[node name="Base" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SongInfo" type="HBoxContainer" parent="Base"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.012
+anchor_top = 0.022
+anchor_right = 0.35
+anchor_bottom = 0.356
+
+[node name="AlbumControl" type="TextureRect" parent="Base/SongInfo"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 2
+size_flags_horizontal = 3
+expand_mode = 4
+stretch_mode = 5
+
+[node name="VSeparator" type="VSeparator" parent="Base/SongInfo"]
+layout_mode = 2
+theme_override_constants/separation = 8
+theme_override_styles/separator = SubResource("StyleBoxEmpty_hauoq")
+
+[node name="Labels" type="VBoxContainer" parent="Base/SongInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Song" type="Label" parent="Base/SongInfo/Labels"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 20)
+layout_mode = 2
+label_settings = SubResource("LabelSettings_jcpgq")
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Artist" type="Label" parent="Base/SongInfo/Labels"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 20)
+layout_mode = 2
+label_settings = SubResource("LabelSettings_jcpgq")
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Album" type="Label" parent="Base/SongInfo/Labels"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 20)
+layout_mode = 2
+label_settings = SubResource("LabelSettings_jcpgq")
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="SubViewportCont" type="SubViewportContainer" parent="Base"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SubViewport" type="SubViewport" parent="Base/SubViewportCont"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="NoteWorld" parent="Base/SubViewportCont/SubViewport" instance=ExtResource("1_alvsf")]

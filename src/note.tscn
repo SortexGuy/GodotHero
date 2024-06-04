@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://bxl8v2ubg70ru"]
+
+[ext_resource type="Script" path="res://src/note.gd" id="2_hcuvb"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_uh5b0"]
+radius = 0.4
+height = 1.2
+radial_segments = 16
+rings = 4
+
+[node name="Note" type="Node3D"]
+script = ExtResource("2_hcuvb")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_uh5b0")

@@ -1,0 +1,113 @@
+[gd_scene load_steps=8 format=3 uid="uid://cubnfmv0qbi1x"]
+
+[ext_resource type="Script" path="res://src/note_world.gd" id="1_7x2y8"]
+[ext_resource type="Texture2D" uid="uid://boo50vt3sj8bb" path="res://test/Muse - Starlight [3-UP]/highway.png" id="2_3hlrl"]
+
+[sub_resource type="Shader" id="Shader_tdpa7"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.2.2.stable's StandardMaterial3D.
+shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+
+uniform vec4 albedo: source_color;
+uniform sampler2D texture_albedo: source_color, filter_linear_mipmap, repeat_enable;
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+
+void vertex() {
+	UV = UV * uv1_scale.xy + uv1_offset.xy;
+}
+
+void fragment() {
+	vec2 base_uv = UV;
+	base_uv.y -= TIME * .5;
+	vec4 albedo_tex = texture(texture_albedo, base_uv);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xcfrf"]
+render_priority = 0
+shader = SubResource("Shader_tdpa7")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/texture_albedo = ExtResource("2_3hlrl")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tjkwp"]
+material = SubResource("ShaderMaterial_xcfrf")
+size = Vector2(5, 20)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q1n7h"]
+radius = 0.4
+height = 1.1
+radial_segments = 16
+rings = 4
+
+[sub_resource type="Environment" id="Environment_kfwfc"]
+background_color = Color(1, 1, 1, 0)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 16.0
+reflected_light_source = 1
+tonemap_mode = 3
+glow_enabled = true
+glow_bloom = 0.15
+
+[node name="NoteWorld" type="Node3D"]
+script = ExtResource("1_7x2y8")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 4, 2)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -9)
+mesh = SubResource("PlaneMesh_tjkwp")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -16)
+
+[node name="Point1" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+
+[node name="Point2" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+
+[node name="Point3" type="Node3D" parent="SpawnPoints"]
+
+[node name="Point4" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+
+[node name="Point5" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+
+[node name="NoteTargets" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Point1" type="MeshInstance3D" parent="NoteTargets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+mesh = SubResource("CapsuleMesh_q1n7h")
+
+[node name="Point2" type="MeshInstance3D" parent="NoteTargets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0)
+mesh = SubResource("CapsuleMesh_q1n7h")
+
+[node name="Point3" type="MeshInstance3D" parent="NoteTargets"]
+mesh = SubResource("CapsuleMesh_q1n7h")
+
+[node name="Point4" type="MeshInstance3D" parent="NoteTargets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+mesh = SubResource("CapsuleMesh_q1n7h")
+
+[node name="Point5" type="MeshInstance3D" parent="NoteTargets"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+mesh = SubResource("CapsuleMesh_q1n7h")
+
+[node name="SpawnTimer" type="Timer" parent="."]
+autostart = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_kfwfc")
+
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]
