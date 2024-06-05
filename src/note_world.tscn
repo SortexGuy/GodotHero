@@ -1,40 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://cubnfmv0qbi1x"]
+[gd_scene load_steps=6 format=3 uid="uid://cubnfmv0qbi1x"]
 
 [ext_resource type="Script" path="res://src/note_world.gd" id="1_7x2y8"]
-[ext_resource type="Texture2D" uid="uid://boo50vt3sj8bb" path="res://test/Muse - Starlight [3-UP]/highway.png" id="2_3hlrl"]
 
-[sub_resource type="Shader" id="Shader_tdpa7"]
-code = "// NOTE: Shader automatically converted from Godot Engine 4.2.2.stable's StandardMaterial3D.
-shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
-
-uniform vec4 albedo: source_color;
-uniform sampler2D texture_albedo: source_color, filter_linear_mipmap, repeat_enable;
-uniform vec3 uv1_scale;
-uniform vec3 uv1_offset;
-
-void vertex() {
-	UV = UV * uv1_scale.xy + uv1_offset.xy;
-}
-
-void fragment() {
-	vec2 base_uv = UV;
-	base_uv.y -= TIME * .5;
-	vec4 albedo_tex = texture(texture_albedo, base_uv);
-	ALBEDO = albedo.rgb * albedo_tex.rgb;
-}
-"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_xcfrf"]
-render_priority = 0
-shader = SubResource("Shader_tdpa7")
-shader_parameter/albedo = Color(1, 1, 1, 1)
-shader_parameter/uv1_scale = Vector3(1, 1, 1)
-shader_parameter/uv1_offset = Vector3(0, 0, 0)
-shader_parameter/texture_albedo = ExtResource("2_3hlrl")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_akgld"]
+shading_mode = 0
+albedo_color = Color(0.0901961, 0.54902, 0.0901961, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_tjkwp"]
-material = SubResource("ShaderMaterial_xcfrf")
+material = SubResource("StandardMaterial3D_akgld")
 size = Vector2(5, 20)
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_q1n7h"]
@@ -65,7 +38,7 @@ mesh = SubResource("PlaneMesh_tjkwp")
 
 [node name="SpawnPoints" type="Node3D" parent="."]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -16)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -19)
 
 [node name="Point1" type="Node3D" parent="SpawnPoints"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)

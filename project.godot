@@ -77,6 +77,10 @@ p_star={
 ]
 }
 
+[physics]
+
+common/max_physics_steps_per_frame=1
+
 [rendering]
 
 renderer/rendering_method="mobile"
