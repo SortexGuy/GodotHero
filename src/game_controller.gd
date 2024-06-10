@@ -15,8 +15,8 @@ var song_chart_path := ""
 
 var song_len_sec: float = 0.0
 var tick_count: int = 0
-var song_chart: ConfigFile
-var game_mode: String = "MediumSingle"
+var song_chart: Dictionary
+var game_mode: String = "HardSingle"
 var timings: Array
 
 var secs_passed: float = 0.0
@@ -37,41 +37,41 @@ func _ready():
 	song_name_label.text = config.get_value("Song", "name")
 	artist_label.text = config.get_value("Song", "artist")
 	album_label.text = config.get_value("Song", "album")
-
+	
 	song_len_sec = config.get_value("Song", "song_length").to_int() / 1000.0
 	print(song_len_sec)
 	
-	song_chart = Parser.parse_chart(song_chart_path)
-	print(song_chart.get_value("Song", "Name"))
-
-	timings = song_chart.get_value(game_mode, "Data")
+	song_chart = Parser.parse_chart_to_dict(song_chart_path)
+	print(song_chart["Song"]["Name"])
+	
+	timings = song_chart[game_mode].keys()
 	timings.reverse()
 
 	song_start_time = Time.get_ticks_msec() / 1000.0
 	pass
 
+@warning_ignore("unused_parameter")
 func _physics_process(delta):
-	#float noteTime = TicksToSeconds(note.tick);  // Convert tick to time
-	#float waitTime = noteTime - (Time.time - songStartTime);  // Calculate how long to wait
-	#if (waitTime > 0) {
-		#yield return new WaitForSeconds(waitTime);  // Wait for the right time to spawn the note
-	#}
-	#SpawnNote(note);  // Spawn the note
-	#var note_time = ticks_to_secs()
-	#
-	#
-	#await get_tree().create_timer(wait_time)	
+	var curr_timing = timings.back()
+	if !curr_timing:
+		return
+	var note_time = ticks_to_secs(curr_timing)
 	
-	#var curr_timing: Array = timings.back()
-	# print(curr_timing, " : ", tick_count)
-	#if tick_count >= curr_timing[0].to_int():
-		#var note = curr_timing[1]
-		#print(curr_timing[0], note)
-		#timings.pop_back()
-	#
-	#var wait_time := 0.0
-	#await get_tree().create_timer(wait_time)
-	pass
+	var wait_time = note_time - ((Time.get_ticks_msec() / 1000.0) - song_start_time)
+	
+	if wait_time > 0:
+		await get_tree().create_timer(wait_time).timeout
+	
+	print(curr_timing, " : ", tick_count)
+	# if tick_count >= curr_timing[0].to_int():
+	# 	var note = curr_timing[1]
+	# 	print(curr_timing[0], note)
+	
+	var note: Array = song_chart[game_mode][curr_timing]
+	if note[0] == "N":
+		note_world.spawn_note(note[1])
+	
+	timings.pop_back()
 
 # ticks = (delta_seconds / (60 / {beats / minute}) * resolution) + ticks_bpm
 func ticks_to_secs(ticks: int) -> float:
