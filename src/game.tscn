@@ -94,3 +94,9 @@ render_target_update_mode = 4
 
 [node name="NoteWorld" parent="Base/SubViewportCont/SubViewport" instance=ExtResource("1_alvsf")]
 unique_name_in_owner = true
+
+[node name="SpawnTimer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]

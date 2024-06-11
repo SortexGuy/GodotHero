@@ -44,34 +44,15 @@ func _ready():
 	song_chart = Parser.parse_chart_to_dict(song_chart_path)
 	print(song_chart["Song"]["Name"])
 	
-	timings = song_chart[game_mode].keys()
+	timings = song_chart[game_mode]
 	timings.reverse()
 
 	song_start_time = Time.get_ticks_msec() / 1000.0
-	pass
+	set_next_note_to_spawn()
 
 @warning_ignore("unused_parameter")
 func _physics_process(delta):
-	var curr_timing = timings.back()
-	if !curr_timing:
-		return
-	var note_time = ticks_to_secs(curr_timing)
-	
-	var wait_time = note_time - ((Time.get_ticks_msec() / 1000.0) - song_start_time)
-	
-	if wait_time > 0:
-		await get_tree().create_timer(wait_time).timeout
-	
-	print(curr_timing, " : ", tick_count)
-	# if tick_count >= curr_timing[0].to_int():
-	# 	var note = curr_timing[1]
-	# 	print(curr_timing[0], note)
-	
-	var note: Array = song_chart[game_mode][curr_timing]
-	if note[0] == "N":
-		note_world.spawn_note(note[1])
-	
-	timings.pop_back()
+	pass
 
 # ticks = (delta_seconds / (60 / {beats / minute}) * resolution) + ticks_bpm
 func ticks_to_secs(ticks: int) -> float:
@@ -103,3 +84,42 @@ func secs_to_ticks(secs: float) -> int:
 	var delta_beats = delta_seconds / sec_per_beat
 	var delta_ticks = delta_beats * resolution
 	return delta_ticks + bpm_start_tick
+
+func set_next_note_to_spawn():
+	if timings.is_empty():
+		return
+	var curr_timing: Array = timings.back()
+	if !curr_timing:
+		return
+	var note_time = ticks_to_secs(curr_timing[0])
+	print("Next: ", curr_timing[0], " ticks or ", note_time, " secs.")
+	
+	var wait_time = note_time - ((Time.get_ticks_msec() / 1000.0) - song_start_time)
+	
+	if wait_time > 0:
+		print("Waiting: ", wait_time)
+		%SpawnTimer.wait_time = wait_time
+		%SpawnTimer.start()
+		return
+
+func _on_spawn_timer_timeout():
+	var curr_timing: Array = timings.back()
+	var note_time := ticks_to_secs(curr_timing[0])
+	var curr_diff_time := ((Time.get_ticks_msec() / 1000.0) - song_start_time)
+	var wait_time := note_time - curr_diff_time
+	
+	while wait_time < 0.017:
+		var note: Array = curr_timing[1]
+		print(curr_timing[0], " : ", note[1])
+		
+		if note[0] == "N":
+			note_world.spawn_note(note[1])
+		
+		timings.pop_back()
+		if timings.is_empty():
+			break
+		curr_timing = timings.back()
+		note_time = ticks_to_secs(curr_timing[0])
+		wait_time = note_time - curr_diff_time
+	
+	set_next_note_to_spawn()

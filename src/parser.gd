@@ -116,14 +116,13 @@ static func parse_chart(file_path: String) -> ConfigFile:
 
 static func parse_chart_to_dict(file_path: String) -> Dictionary:
 	var file := FileAccess.open(file_path, FileAccess.READ)
-	#var config := ConfigFile.new()
 	var dict := {}
 	var inner_dict := {}
 	var section: String
 
 	# For storing note info in which the spawn time might be duplicated
-	#var data_arr: = []
-	#var data_section: bool = false
+	var data_arr: = []
+	var data_section: bool = false
 
 	print("Parsing file: " + file_path)
 	while file.is_open():
@@ -139,8 +138,12 @@ static func parse_chart_to_dict(file_path: String) -> Dictionary:
 			continue
 		elif line.begins_with("}"):
 			# Close and save data or ignore if is just info
-			dict[section] = inner_dict.duplicate(true)
-			inner_dict.clear()
+			if not data_section:
+				dict[section] = inner_dict.duplicate(true)
+				inner_dict.clear()
+			else:
+				dict[section] = data_arr.duplicate(true)
+				data_arr.clear()
 			print("Closing ", section)
 			continue
 		
@@ -154,12 +157,11 @@ static func parse_chart_to_dict(file_path: String) -> Dictionary:
 
 			# Parse the key-value pair
 			var key_value := line.split("=", true)
-			var key: Variant = key_value[0].strip_edges()
+			var key = key_value[0].strip_edges()
 			var value: Variant = key_value[1].strip_edges()
 
 			if key.is_valid_int(): # Parse data (notes and events)
-				#data_section = true
-				key = key.to_int()
+				data_section = true
 				var split: PackedStringArray = value.split(" ")
 				value = []
 				
@@ -178,7 +180,7 @@ static func parse_chart_to_dict(file_path: String) -> Dictionary:
 					value.append(split[2].to_int())
 				
 				# Save data-point as [time, [tag, type{, sustain}]]
-				#data_arr.append([key.to_int(), value])
+				data_arr.append([key.to_int(), value])
 			else:
 				if value.begins_with("\""): # Parse raw string
 					value = value.substr(1, value.length() - 2)
@@ -186,14 +188,9 @@ static func parse_chart_to_dict(file_path: String) -> Dictionary:
 					value = value.to_int()
 				elif value.split(" ").size() == 1: # Parse maybe enum (?)
 					pass
-			
-			# Save info (not data) inside section
-			inner_dict[key] = value
-			#if not data_section:
-				#config.set_value(section, key, value)
+				inner_dict[key] = value
 		
 		# End of loop
-
+	
 	print("Done parsing file")
 	return dict
-
