@@ -41,7 +41,7 @@ func _ready():
 	song_len_sec = config.get_value("Song", "song_length").to_int() / 1000.0
 	print(song_len_sec)
 	
-	song_chart = Parser.parse_chart_to_dict(song_chart_path)
+	song_chart = Parser.parse_chart(song_chart_path)
 	print(song_chart["Song"]["Name"])
 	
 	timings = song_chart[game_mode]
